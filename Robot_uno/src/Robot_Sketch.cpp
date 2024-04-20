@@ -84,7 +84,7 @@ void loop()
   {
     reset();
   }
-  else if (1000)
+  else if (cordinates == 1000)
   {
     setDelay();
   }
