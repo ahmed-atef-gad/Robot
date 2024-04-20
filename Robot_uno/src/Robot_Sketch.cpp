@@ -80,6 +80,8 @@ void loop()
     }
     serial_mask = 1;
   }
+  Serial.print("Cordinates: ");
+  Serial.println(cordinates);
   if (cordinates == 0)
   {
     reset();
@@ -120,7 +122,8 @@ void setDelay()
   {
     TURN_FROWARD_DELAY = Serial.parseInt();
   }
-  Serial.println("Delay Set>>>>");
+  Serial.println("Delay Has Been Set>>>>");
+  serial_mask = 0;
   delay(100);
 }
 
@@ -140,6 +143,7 @@ void reset()
   prev[1] = 0;
   cordinates = 0;
   serial_mask = 0;
+  Serial.println("Reset Done>>>>");
 }
 
 void inertia()
