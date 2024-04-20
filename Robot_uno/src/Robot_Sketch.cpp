@@ -316,6 +316,15 @@ void calc()
 {
   x = nx - ox;
   y = ny - oy;
+
+  if (x == 0 && y == 0)
+  {
+    Serial.println("Already at the destination");
+    delay(200);
+    serial_mask = 0;
+    return;
+  }
+
   if (x > 0 && y > 0)
   {
     moveY();
