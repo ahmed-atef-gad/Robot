@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include "MPU6050.h"
+#include <Wire.h>
 
 #define motor_R1 5    // Right motor pole 1
 #define motor_R2 4    // Right motor pole 2
@@ -10,7 +12,9 @@
 #define LEFT_IR A2     // ss2
 #define RIGHT_IR A3    // ss4
 #define extLEFT_IR A1  // ss1
-#define extRIGHT_IR A4 // ss5
+#define extRIGHT_IR A0 // ss5
+#define SDA A4
+#define SCL A5
 
 int TURN_90_DELAY = 880;
 int TURN_180_DELAY = 1800;
@@ -25,6 +29,12 @@ int income[2];
 int state = 0; // orientation state (1=Forward, 2=Reverse, 3=Right, 4=Left)Zero is initial state
 int cordinates = 0;
 // function prototypes
+
+MPU6050 mpu;
+int16_t ax, ay, az;
+float angleOffset = 0.0;
+float angleZ = 0.0;
+float targetAngle = 0.0;
 
 void inertia();
 void forward();
@@ -49,6 +59,7 @@ void reset();
 
 void setup()
 {
+  Wire.begin();
   Serial.begin(9600);
   pinMode(motor_R1, OUTPUT);
   pinMode(motor_R2, OUTPUT);
@@ -64,6 +75,20 @@ void setup()
   analogWrite(Rmotor_vel, 100);
   analogWrite(Lmotor_vel, 100);
   Serial.println("Initializing>>>>");
+
+  mpu.initialize();
+  mpu.setFullScaleGyroRange(MPU6050_GYRO_FS_250);
+  mpu.setFullScaleAccelRange(MPU6050_ACCEL_FS_2);
+  
+  delay(100);
+  
+  // Calibrate gyro
+  for(int i = 0; i < 1000; i++) {
+    mpu.getMotion6(&ax, &ay, &az, NULL, NULL, NULL);
+    angleOffset += atan2(-ax, -az);
+    delay(1);
+  }
+  angleOffset /= 1000.0;
 }
 void loop()
 {
@@ -238,13 +263,17 @@ void Tleft90()
   delay(TURN_FROWARD_DELAY);
   off();
   delay(200);
-  analogWrite(Rmotor_vel, 180);
-  analogWrite(Lmotor_vel, 180);
-  digitalWrite(motor_R1, LOW);
-  digitalWrite(motor_R2, HIGH);
-  digitalWrite(motor_L1, HIGH);
-  digitalWrite(motor_L2, LOW);
-  delay(TURN_90_DELAY);
+  targetAngle = fmod(angleZ - 90.0 + 360.0, 360.0);
+  while (angleZ > targetAngle) {
+    analogWrite(Rmotor_vel, 180);
+    analogWrite(Lmotor_vel, 180);
+    digitalWrite(motor_R1, LOW);
+    digitalWrite(motor_R2, HIGH);
+    digitalWrite(motor_L1, HIGH);
+    digitalWrite(motor_L2, LOW);
+  }
+  
+  //delay(TURN_90_DELAY);
 }
 void Tright90()
 {
@@ -252,13 +281,17 @@ void Tright90()
   delay(TURN_FROWARD_DELAY);
   off();
   delay(200);
-  analogWrite(Rmotor_vel, 110);
-  analogWrite(Lmotor_vel, 110);
-  digitalWrite(motor_R1, HIGH);
-  digitalWrite(motor_R2, LOW);
-  digitalWrite(motor_L1, LOW);
-  digitalWrite(motor_L2, HIGH);
-  delay(TURN_90_DELAY);
+  targetAngle = fmod(angleZ + 90.0, 360.0);
+  while (angleZ < targetAngle) {
+    analogWrite(Rmotor_vel, 110);
+    analogWrite(Lmotor_vel, 110);
+    digitalWrite(motor_R1, HIGH);
+    digitalWrite(motor_R2, LOW);
+    digitalWrite(motor_L1, LOW);
+    digitalWrite(motor_L2, HIGH);
+  }
+  
+  //delay(TURN_90_DELAY);
 }
 
 void Tright180()
@@ -266,13 +299,17 @@ void Tright180()
   forward();
   delay(TURN_FROWARD_DELAY);
   off();
-  analogWrite(Rmotor_vel, 120);
-  analogWrite(Lmotor_vel, 120);
-  digitalWrite(motor_R1, HIGH);
-  digitalWrite(motor_R2, LOW);
-  digitalWrite(motor_L1, LOW);
-  digitalWrite(motor_L2, HIGH);
-  delay(TURN_180_DELAY);
+  targetAngle = fmod(angleZ + 180.0, 360.0);
+  while (angleZ < targetAngle) {
+    analogWrite(Rmotor_vel, 120);
+    analogWrite(Lmotor_vel, 120);
+    digitalWrite(motor_R1, HIGH);
+    digitalWrite(motor_R2, LOW);
+    digitalWrite(motor_L1, LOW);
+    digitalWrite(motor_L2, HIGH);
+  }
+  
+  //delay(TURN_180_DELAY);
 }
 
 void getvalues()
@@ -283,6 +320,11 @@ void getvalues()
   // c=digitalRead(center_ir);
   right_ir = digitalRead(RIGHT_IR);
   extright_ir = digitalRead(extRIGHT_IR);
+
+  mpu.getMotion6(&ax, &ay, &az, NULL, NULL, NULL);
+
+  angleZ = atan2(-ax, -az) - angleOffset;
+  angleZ = angleZ * 180 / M_PI;
 }
 
 void compare()
