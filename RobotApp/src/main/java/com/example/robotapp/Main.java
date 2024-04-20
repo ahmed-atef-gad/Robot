@@ -27,11 +27,11 @@ public class Main extends Application {
 
     ScreensController mainContainer;
 
-    public Main(){
+    public Main() {
         mainContainer = new ScreensController(this);
-        mainContainer.loadScreen("ChatScreen","ChatScreen.fxml");
-        mainContainer.loadScreen("LoadingScreen","LoadingScreen.fxml");
-        mainContainer.loadScreen("ServerListScreen","ServerListScreen.fxml");
+        mainContainer.loadScreen("ChatScreen", "ChatScreen.fxml");
+        mainContainer.loadScreen("LoadingScreen", "LoadingScreen.fxml");
+        mainContainer.loadScreen("ServerListScreen", "ServerListScreen.fxml");
         mainContainer.setScreen("LoadingScreen.fxml");
 
         try {
@@ -43,14 +43,14 @@ public class Main extends Application {
         initClient();
     }
 
-    public void initClient(){
+    public void initClient() {
         client = new SPPClient();
         client.setOnDeviceDiscovery((ActionEvent e) -> {
             ObservableList<RemoteDeviceInfo> devInfo = FXCollections.observableList(client.getDeviceInfos());
-            ((ServerListScreenController)mainContainer.getScreenController("ServerListScreen")).setTableData(devInfo);
+            ((ServerListScreenController) mainContainer.getScreenController("ServerListScreen")).setTableData(devInfo);
             mainContainer.setScreen("ServerListScreen");
         });
-        ((LoadingScreenController)mainContainer.getScreenController("LoadingScreen")).setText("Searching for Bluetooth Devices ...");
+        ((LoadingScreenController) mainContainer.getScreenController("LoadingScreen")).setText("Searching for Bluetooth Devices ...");
         mainContainer.setScreen("LoadingScreen");
         client.startDiscovery();
 
@@ -64,37 +64,41 @@ public class Main extends Application {
         });
     }
 
-    public void refresh(){
-        ((LoadingScreenController)mainContainer.getScreenController("LoadingScreen")).setText("Searching for Bluetooth Devices ...");
+    public void refresh() {
+        ((LoadingScreenController) mainContainer.getScreenController("LoadingScreen")).setText("Searching for Bluetooth Devices ...");
         mainContainer.setScreen("LoadingScreen");
         client.startDiscovery();
     }
 
 
-    public void connectToDevice(int index){
-        ((LoadingScreenController)mainContainer.getScreenController("LoadingScreen")).setText("Connecting ...");
+    public void connectToDevice(int index) {
+        ((LoadingScreenController) mainContainer.getScreenController("LoadingScreen")).setText("Connecting ...");
         mainContainer.setScreen("LoadingScreen");
         client.connect(index);
     }
 
-    public void sendMsg(String s){
+    public void reconnectDevice() {
+        client.reconnect();
+    }
+
+    public void sendMsg(String s) {
         System.out.println("must send " + s);
-        out.write(s+"\r\n");
+        out.write(s);
         out.flush();
     }
 
-    public void recieveMsg(String s){
-        ChatScreenController ch = ((ChatScreenController)mainContainer.getScreenController("ChatScreen"));
+    public void recieveMsg(String s) {
+        ChatScreenController ch = ((ChatScreenController) mainContainer.getScreenController("ChatScreen"));
         ch.recivedMassage(s);
     }
 
-    class streamPoller extends Thread{
+    class streamPoller extends Thread {
 
-        public void run(){
+        public void run() {
             boolean isRun = true;
-            while(isRun){
+            while (isRun) {
                 try {
-                    if(in != null) {
+                    if (in != null) {
                         System.out.println("in not null");
                         String s = in.readLine();
                         if (s != null) Platform.runLater(() -> recieveMsg(s));
@@ -108,15 +112,15 @@ public class Main extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
         AnchorPane root = new AnchorPane();
         root.getChildren().addAll(mainContainer);
-        AnchorPane.setTopAnchor(mainContainer,0.0);
-        AnchorPane.setBottomAnchor(mainContainer,0.0);
-        AnchorPane.setLeftAnchor(mainContainer,0.0);
-        AnchorPane.setRightAnchor(mainContainer,0.0);
+        AnchorPane.setTopAnchor(mainContainer, 0.0);
+        AnchorPane.setBottomAnchor(mainContainer, 0.0);
+        AnchorPane.setLeftAnchor(mainContainer, 0.0);
+        AnchorPane.setRightAnchor(mainContainer, 0.0);
 
-        Scene scene = new Scene(root,350,600);
+        Scene scene = new Scene(root, 350, 600);
         primaryStage.setTitle("Bluetooth Chat v1.0");
         primaryStage.setScene(scene);
         primaryStage.show();

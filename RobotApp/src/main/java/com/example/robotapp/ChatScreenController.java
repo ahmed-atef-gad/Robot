@@ -11,7 +11,7 @@ public class ChatScreenController implements ControlledScreen {
     Main myLogicalParent;
 
     @Override
-    public void setParents(ScreensController screenPage,Main logical) {
+    public void setParents(ScreensController screenPage, Main logical) {
         myLogicalParent = logical;
         myScreenController = screenPage;
     }
@@ -37,7 +37,31 @@ public class ChatScreenController implements ControlledScreen {
         myLogicalParent.sendMsg(msg);
     }
 
-    public void recivedMassage(String msg){
+    @FXML
+    protected void enterPressed(javafx.scene.input.KeyEvent event) {
+        if (event.getCode().toString().equals("ENTER")) {
+            String msg = chatText.getText();
+            Text blue = new Text(myLogicalParent.myName + " : ");
+            blue.setStyle("-fx-fill: #0098d8");
+
+            msg = msg.substring(0, msg.length() - 1);
+
+            Text m = new Text(msg + "\n");
+
+            chatLog.getChildren().add(blue);
+            chatLog.getChildren().add(m);
+
+            chatText.setText("");
+            myLogicalParent.sendMsg(msg);
+        }
+    }
+
+    @FXML
+    protected void reconnectDevice() {
+        myLogicalParent.reconnectDevice();
+    }
+
+    public void recivedMassage(String msg) {
         Text red = new Text(myLogicalParent.partnerName + " : ");
         red.setStyle("-fx-fill: orangered");
 

@@ -126,6 +126,35 @@ void setDelay()
   serial_mask = 0;
   delay(100);
 }
+void setSpeed()
+{
+  Serial.println("Setting Speed >>");
+  delay(200);
+  Serial.println("Set Motor 1 speed >>>>");
+  while (!Serial.available())
+    ;
+  if (Serial.available())
+  {
+    TURN_90_DELAY = Serial.parseInt();
+  }
+  Serial.println("Set Turn 180 Delay>>>>");
+  while (!Serial.available())
+    ;
+  if (Serial.available())
+  {
+    TURN_180_DELAY = Serial.parseInt();
+  }
+  Serial.println("Set Turn Forward Delay>>>>");
+  while (!Serial.available())
+    ;
+  if (Serial.available())
+  {
+    TURN_FROWARD_DELAY = Serial.parseInt();
+  }
+  Serial.println("Delay Has Been Set>>>>");
+  serial_mask = 0;
+  delay(100);
+}
 
 void reset()
 {
@@ -209,8 +238,8 @@ void Tleft90()
   delay(TURN_FROWARD_DELAY);
   off();
   delay(200);
-  analogWrite(Rmotor_vel, 120);
-  analogWrite(Lmotor_vel, 120);
+  analogWrite(Rmotor_vel, 180);
+  analogWrite(Lmotor_vel, 180);
   digitalWrite(motor_R1, LOW);
   digitalWrite(motor_R2, HIGH);
   digitalWrite(motor_L1, HIGH);
