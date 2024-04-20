@@ -1,8 +1,8 @@
 module com.example.robotapp {
     requires javafx.controls;
     requires javafx.fxml;
-    requires bluecove;
     requires java.desktop;
+    requires bluecove;
 
 
     opens com.example.robotapp to javafx.fxml;

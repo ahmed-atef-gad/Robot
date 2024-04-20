@@ -32,6 +32,7 @@ public class Main extends Application {
         mainContainer.loadScreen("ChatScreen", "ChatScreen.fxml");
         mainContainer.loadScreen("LoadingScreen", "LoadingScreen.fxml");
         mainContainer.loadScreen("ServerListScreen", "ServerListScreen.fxml");
+        mainContainer.loadScreen("ControlUi", "ControlUi.fxml");
         mainContainer.setScreen("LoadingScreen.fxml");
 
         try {
@@ -59,7 +60,7 @@ public class Main extends Application {
             in = client.in;
             out = client.out;
             partnerName = client.partnerName;
-            mainContainer.setScreen("ChatScreen");
+            mainContainer.setScreen("ControlUi");
             (new streamPoller()).start();
         });
     }
@@ -90,6 +91,8 @@ public class Main extends Application {
     public void recieveMsg(String s) {
         ChatScreenController ch = ((ChatScreenController) mainContainer.getScreenController("ChatScreen"));
         ch.recivedMassage(s);
+        ControlUiController cu = ((ControlUiController) mainContainer.getScreenController("ControlUi"));
+        cu.receivedMassage(s);
     }
 
     class streamPoller extends Thread {
@@ -120,7 +123,7 @@ public class Main extends Application {
         AnchorPane.setLeftAnchor(mainContainer, 0.0);
         AnchorPane.setRightAnchor(mainContainer, 0.0);
 
-        Scene scene = new Scene(root, 350, 600);
+        Scene scene = new Scene(root, 800, 600);
         primaryStage.setTitle("Bluetooth Chat v1.0");
         primaryStage.setScene(scene);
         primaryStage.show();
