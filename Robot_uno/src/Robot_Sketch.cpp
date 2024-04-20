@@ -11,18 +11,19 @@
 #define RIGHT_IR A3    // ss4
 #define extLEFT_IR A1  // ss1
 #define extRIGHT_IR A4 // ss5
-#define TURN_90_DELAY 1050
-#define TURN_180_DELAY 2000
-#define TURN_FROWARD_DELAY 210
 
-int left_ir, right_ir, extleft_ir, extright_ir;                                   // Define variables which used to store digital inputs values
-int Intersection_mask = 0, start_mask = 0, mark1 = 0, mark2 = 0, serial_mask = 0; // int mask3=0;
+int TURN_90_DELAY = 880;
+int TURN_180_DELAY = 1800;
+int TURN_FROWARD_DELAY = 210;
+
+int left_ir, right_ir, extleft_ir, extright_ir; // Define variables which used to store digital inputs values
+int Intersection_mask = 0, start_mask = 0, mark1 = 0, mark2 = 0, serial_mask = 0;
 int x = 0, y = 0, ox = 0, oy = 0, nx = 0, ny = 0, pos = 0;
 int pxy[2], prev[2];
 // boolean tx_mode=false;
 int income[2];
 int state = 0; // orientation state (1=Forward, 2=Reverse, 3=Right, 4=Left)Zero is initial state
-
+int cordinates = 0;
 // function prototypes
 
 void inertia();
@@ -43,6 +44,8 @@ void moveY();
 void moveX();
 void moveY_neg();
 void moveX_neg();
+void setDelay();
+void reset();
 
 void setup()
 {
@@ -71,15 +74,72 @@ void loop()
       ;
     if (Serial.available())
     {
-      int cordinates = Serial.parseInt();
+      cordinates = Serial.parseInt();
       income[0] = cordinates / 10;
       income[1] = cordinates % 10;
     }
     serial_mask = 1;
   }
+  if (cordinates == 0)
+  {
+    reset();
+  }
+  else if (1000)
+  {
+    setDelay();
+  }
+  else
+  {
+    getxy();
+    calc();
+  }
+}
 
-  getxy();
-  calc();
+void setDelay()
+{
+  Serial.println("Setting Delay>>>>");
+  delay(100);
+  Serial.println("Set Turn 90 Delay>>>>");
+  while (!Serial.available())
+    ;
+  if (Serial.available())
+  {
+    TURN_90_DELAY = Serial.parseInt();
+  }
+  Serial.println("Set Turn 180 Delay>>>>");
+  while (!Serial.available())
+    ;
+  if (Serial.available())
+  {
+    TURN_180_DELAY = Serial.parseInt();
+  }
+  Serial.println("Set Turn Forward Delay>>>>");
+  while (!Serial.available())
+    ;
+  if (Serial.available())
+  {
+    TURN_FROWARD_DELAY = Serial.parseInt();
+  }
+  Serial.println("Delay Set>>>>");
+  delay(100);
+}
+
+void reset()
+{
+  Serial.println("Resetting>>>>");
+  ox = 0;
+  oy = 0;
+  x = 0;
+  y = 0;
+  nx = 0;
+  ny = 0;
+  pos = 0;
+  pxy[0] = 0;
+  pxy[1] = 0;
+  prev[0] = 0;
+  prev[1] = 0;
+  cordinates = 0;
+  serial_mask = 0;
 }
 
 void inertia()
@@ -90,7 +150,7 @@ void inertia()
   digitalWrite(motor_R2, HIGH);
   digitalWrite(motor_L1, LOW);
   digitalWrite(motor_L2, HIGH);
-  // delay(100);
+  delay(100);
 }
 void forward()
 {
@@ -100,7 +160,6 @@ void forward()
   digitalWrite(motor_R2, HIGH);
   digitalWrite(motor_L1, LOW);
   digitalWrite(motor_L2, HIGH);
-  delay(TURN_FROWARD_DELAY);
 }
 
 void reverse()
@@ -111,7 +170,7 @@ void reverse()
   digitalWrite(motor_L2, LOW);
 }
 
-void Tleft()
+void Tright()
 {
   analogWrite(Rmotor_vel, 130);
   analogWrite(Lmotor_vel, 110);
@@ -121,7 +180,7 @@ void Tleft()
   digitalWrite(motor_L2, LOW);
   // delay(100);
 }
-void Tright()
+void Tleft()
 {
   analogWrite(Rmotor_vel, 110);
   analogWrite(Lmotor_vel, 130);
@@ -141,6 +200,7 @@ void off()
 void Tleft90()
 {
   forward();
+  delay(TURN_FROWARD_DELAY);
   off();
   delay(200);
   analogWrite(Rmotor_vel, 120);
@@ -154,6 +214,7 @@ void Tleft90()
 void Tright90()
 {
   forward();
+  delay(TURN_FROWARD_DELAY);
   off();
   delay(200);
   analogWrite(Rmotor_vel, 110);
@@ -168,6 +229,7 @@ void Tright90()
 void Tright180()
 {
   forward();
+  delay(TURN_FROWARD_DELAY);
   off();
   analogWrite(Rmotor_vel, 120);
   analogWrite(Lmotor_vel, 120);
