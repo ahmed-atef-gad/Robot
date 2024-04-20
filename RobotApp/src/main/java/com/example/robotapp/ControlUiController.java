@@ -126,7 +126,7 @@ public class ControlUiController implements ControlledScreen {
                 Thread.sleep(5000);
                 message.setText("");
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                e.fillInStackTrace();
             }
         }).start();
     }

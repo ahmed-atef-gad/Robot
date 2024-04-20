@@ -44,7 +44,7 @@ public class SPPClient implements DiscoveryListener {
             agent = localDevice.getDiscoveryAgent();
 
         } catch (BluetoothStateException e) {
-            e.printStackTrace();
+            e.fillInStackTrace();
         }
     }
 
@@ -66,7 +66,7 @@ public class SPPClient implements DiscoveryListener {
         try {
             agent.startInquiry(DiscoveryAgent.GIAC, this);
         } catch (BluetoothStateException e) {
-            e.printStackTrace();
+            e.fillInStackTrace();
         }
     }
 
@@ -77,7 +77,7 @@ public class SPPClient implements DiscoveryListener {
                 RemoteDeviceInfo rdi = new RemoteDeviceInfo(rd.getFriendlyName(true), rd.getBluetoothAddress());
                 res.add(rdi);
             } catch (IOException e) {
-                e.printStackTrace();
+                e.fillInStackTrace();
             }
         }
         return res;
@@ -99,9 +99,9 @@ public class SPPClient implements DiscoveryListener {
             fw.close();
 
         } catch (BluetoothStateException e) {
-            e.printStackTrace();
+            e.fillInStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            e.fillInStackTrace();
         }
     }
 
@@ -113,9 +113,9 @@ public class SPPClient implements DiscoveryListener {
             System.out.println("\nSearching for service...");
             agent.searchServices(null, uuidSet, remoteDevice, this);
         } catch (BluetoothStateException e) {
-            e.printStackTrace();
+            e.fillInStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            e.fillInStackTrace();
         }
     }
 
@@ -147,7 +147,7 @@ public class SPPClient implements DiscoveryListener {
             if (onConnectionSuccessful != null)
                 onConnectionSuccessful.actionPerformed(new ActionEvent(this, ActionEvent.RESERVED_ID_MAX + 1, ""));
         } catch (IOException e) {
-            e.printStackTrace();
+            e.fillInStackTrace();
         }
     }
 

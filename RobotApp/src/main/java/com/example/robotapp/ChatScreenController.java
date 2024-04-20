@@ -61,7 +61,7 @@ public class ChatScreenController implements ControlledScreen {
         myLogicalParent.reconnectDevice();
     }
 
-    public void recivedMassage(String msg) {
+    public void receivedMassage(String msg) {
         Text red = new Text(myLogicalParent.partnerName + " : ");
         red.setStyle("-fx-fill: orangered");
 

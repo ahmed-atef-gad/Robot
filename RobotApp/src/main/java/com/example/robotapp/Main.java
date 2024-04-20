@@ -39,7 +39,7 @@ public class Main extends Application {
             LocalDevice localDevice = LocalDevice.getLocalDevice();
             myName = localDevice.getFriendlyName();
         } catch (BluetoothStateException e) {
-            e.printStackTrace();
+            e.fillInStackTrace();
         }
         initClient();
     }
@@ -90,7 +90,7 @@ public class Main extends Application {
 
     public void recieveMsg(String s) {
         ChatScreenController ch = ((ChatScreenController) mainContainer.getScreenController("ChatScreen"));
-        ch.recivedMassage(s);
+        ch.receivedMassage(s);
         ControlUiController cu = ((ControlUiController) mainContainer.getScreenController("ControlUi"));
         cu.receivedMassage(s);
     }
@@ -108,7 +108,7 @@ public class Main extends Application {
                         else isRun = false;
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    e.fillInStackTrace();
                 }
             }
         }
