@@ -79,16 +79,18 @@ void setup()
   mpu.initialize();
   mpu.setFullScaleGyroRange(MPU6050_GYRO_FS_250);
   mpu.setFullScaleAccelRange(MPU6050_ACCEL_FS_2);
-  
+
   delay(100);
-  
+
   // Calibrate gyro
-  for(int i = 0; i < 1000; i++) {
+  for (int i = 0; i < 1000; i++)
+  {
     mpu.getMotion6(&ax, &ay, &az, NULL, NULL, NULL);
     angleOffset += atan2(-ax, -az);
     delay(1);
   }
   angleOffset /= 1000.0;
+  Serial.println("Calibrate Done");
 }
 void loop()
 {
@@ -264,16 +266,21 @@ void Tleft90()
   off();
   delay(200);
   targetAngle = fmod(angleZ - 90.0 + 360.0, 360.0);
-  while (angleZ > targetAngle) {
+  Serial.print("anglez : ");
+  Serial.println(angleZ);
+  while (angleZ > targetAngle)
+  {
     analogWrite(Rmotor_vel, 180);
     analogWrite(Lmotor_vel, 180);
     digitalWrite(motor_R1, LOW);
     digitalWrite(motor_R2, HIGH);
     digitalWrite(motor_L1, HIGH);
     digitalWrite(motor_L2, LOW);
+    getvalues();
+    Serial.println(angleZ);
   }
-  
-  //delay(TURN_90_DELAY);
+
+  // delay(TURN_90_DELAY);
 }
 void Tright90()
 {
@@ -282,16 +289,19 @@ void Tright90()
   off();
   delay(200);
   targetAngle = fmod(angleZ + 90.0, 360.0);
-  while (angleZ < targetAngle) {
+  while (angleZ < targetAngle)
+  {
     analogWrite(Rmotor_vel, 110);
     analogWrite(Lmotor_vel, 110);
     digitalWrite(motor_R1, HIGH);
     digitalWrite(motor_R2, LOW);
     digitalWrite(motor_L1, LOW);
     digitalWrite(motor_L2, HIGH);
+    getvalues();
+    Serial.println(angleZ);
   }
-  
-  //delay(TURN_90_DELAY);
+
+  // delay(TURN_90_DELAY);
 }
 
 void Tright180()
@@ -300,16 +310,19 @@ void Tright180()
   delay(TURN_FROWARD_DELAY);
   off();
   targetAngle = fmod(angleZ + 180.0, 360.0);
-  while (angleZ < targetAngle) {
+  while (angleZ < targetAngle)
+  {
     analogWrite(Rmotor_vel, 120);
     analogWrite(Lmotor_vel, 120);
     digitalWrite(motor_R1, HIGH);
     digitalWrite(motor_R2, LOW);
     digitalWrite(motor_L1, LOW);
     digitalWrite(motor_L2, HIGH);
+    getvalues();
+    Serial.println(angleZ);
   }
-  
-  //delay(TURN_180_DELAY);
+
+  // delay(TURN_180_DELAY);
 }
 
 void getvalues()
