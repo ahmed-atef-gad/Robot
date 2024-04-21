@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "MPU6050.h"
+#include <MPU6050_tockn.h>
 #include <Wire.h>
 
 #define motor_R1 5    // Right motor pole 1
@@ -16,25 +16,23 @@
 #define SDA A4
 #define SCL A5
 
-int TURN_90_DELAY = 880;
-int TURN_180_DELAY = 1800;
-int TURN_FROWARD_DELAY = 210;
+float targetAngle=0.0;
+
+MPU6050 mpu6050(Wire);
+
+int TURN_FROWARD_DELAY = 300;
+int TURN_SPEED =140;
 
 int left_ir, right_ir, extleft_ir, extright_ir; // Define variables which used to store digital inputs values
 int Intersection_mask = 0, start_mask = 0, mark1 = 0, mark2 = 0, serial_mask = 0;
 int x = 0, y = 0, ox = 0, oy = 0, nx = 0, ny = 0, pos = 0;
 int pxy[2], prev[2];
-// boolean tx_mode=false;
 int income[2];
 int state = 0; // orientation state (1=Forward, 2=Reverse, 3=Right, 4=Left)Zero is initial state
 int cordinates = 0;
 // function prototypes
 
-MPU6050 mpu;
-int16_t ax, ay, az;
-float angleOffset = 0.0;
-float angleZ = 0.0;
-float targetAngle = 0.0;
+
 
 void inertia();
 void forward();
@@ -54,13 +52,12 @@ void moveY();
 void moveX();
 void moveY_neg();
 void moveX_neg();
-void setDelay();
 void reset();
 
 void setup()
 {
-  Wire.begin();
   Serial.begin(9600);
+  Wire.begin();
   pinMode(motor_R1, OUTPUT);
   pinMode(motor_R2, OUTPUT);
   pinMode(motor_L1, OUTPUT);
@@ -76,29 +73,18 @@ void setup()
   analogWrite(Lmotor_vel, 100);
   Serial.println("Initializing>>>>");
 
-  mpu.initialize();
-  mpu.setFullScaleGyroRange(MPU6050_GYRO_FS_250);
-  mpu.setFullScaleAccelRange(MPU6050_ACCEL_FS_2);
-
-  delay(100);
-
-  // Calibrate gyro
-  for (int i = 0; i < 1000; i++)
-  {
-    mpu.getMotion6(&ax, &ay, &az, NULL, NULL, NULL);
-    angleOffset += atan2(-ax, -az);
-    delay(1);
-  }
-  angleOffset /= 1000.0;
-  Serial.println("Calibrate Done");
+  mpu6050.begin();
+  mpu6050.calcGyroOffsets(true);
+  
 }
+
 void loop()
 {
 
+  mpu6050.update();
   if (serial_mask == 0)
   {
-    while (!Serial.available())
-      ;
+    while (!Serial.available());
     if (Serial.available())
     {
       cordinates = Serial.parseInt();
@@ -113,10 +99,6 @@ void loop()
   {
     reset();
   }
-  else if (cordinates == 1000)
-  {
-    setDelay();
-  }
   else
   {
     getxy();
@@ -124,64 +106,6 @@ void loop()
   }
 }
 
-void setDelay()
-{
-  Serial.println("Setting Delay>>>>");
-  delay(200);
-  Serial.println("Set Turn 90 Delay>>>>");
-  while (!Serial.available())
-    ;
-  if (Serial.available())
-  {
-    TURN_90_DELAY = Serial.parseInt();
-  }
-  Serial.println("Set Turn 180 Delay>>>>");
-  while (!Serial.available())
-    ;
-  if (Serial.available())
-  {
-    TURN_180_DELAY = Serial.parseInt();
-  }
-  Serial.println("Set Turn Forward Delay>>>>");
-  while (!Serial.available())
-    ;
-  if (Serial.available())
-  {
-    TURN_FROWARD_DELAY = Serial.parseInt();
-  }
-  Serial.println("Delay Has Been Set>>>>");
-  serial_mask = 0;
-  delay(100);
-}
-void setSpeed()
-{
-  Serial.println("Setting Speed >>");
-  delay(200);
-  Serial.println("Set Motor 1 speed >>>>");
-  while (!Serial.available())
-    ;
-  if (Serial.available())
-  {
-    TURN_90_DELAY = Serial.parseInt();
-  }
-  Serial.println("Set Turn 180 Delay>>>>");
-  while (!Serial.available())
-    ;
-  if (Serial.available())
-  {
-    TURN_180_DELAY = Serial.parseInt();
-  }
-  Serial.println("Set Turn Forward Delay>>>>");
-  while (!Serial.available())
-    ;
-  if (Serial.available())
-  {
-    TURN_FROWARD_DELAY = Serial.parseInt();
-  }
-  Serial.println("Delay Has Been Set>>>>");
-  serial_mask = 0;
-  delay(100);
-}
 
 void reset()
 {
@@ -259,49 +183,46 @@ void off()
   digitalWrite(motor_L1, LOW);
   digitalWrite(motor_L2, LOW);
 }
+
 void Tleft90()
 {
   forward();
   delay(TURN_FROWARD_DELAY);
   off();
   delay(200);
-  targetAngle = fmod(angleZ - 90.0 + 360.0, 360.0);
-  Serial.print("anglez : ");
-  Serial.println(angleZ);
-  while (angleZ > targetAngle)
+  //targetAngle = fmod(mpu6050.getAngleZ() + 90.0, 360.0);
+  targetAngle = mpu6050.getAngleZ() + 90.0;
+  while (targetAngle > mpu6050.getAngleZ())
   {
-    analogWrite(Rmotor_vel, 180);
-    analogWrite(Lmotor_vel, 180);
-    digitalWrite(motor_R1, LOW);
-    digitalWrite(motor_R2, HIGH);
-    digitalWrite(motor_L1, HIGH);
-    digitalWrite(motor_L2, LOW);
+    analogWrite(Rmotor_vel, TURN_SPEED);
+    analogWrite(Lmotor_vel, TURN_SPEED);
+    digitalWrite(motor_R1, HIGH);
+    digitalWrite(motor_R2, LOW);
+    digitalWrite(motor_L1, LOW);
+    digitalWrite(motor_L2, HIGH);
     getvalues();
-    Serial.println(angleZ);
-  }
 
-  // delay(TURN_90_DELAY);
+  }
 }
+
 void Tright90()
 {
   forward();
   delay(TURN_FROWARD_DELAY);
   off();
   delay(200);
-  targetAngle = fmod(angleZ + 90.0, 360.0);
-  while (angleZ < targetAngle)
+  //targetAngle = fmod(mpu6050.getAngleZ() - 90.0 , 360.0);
+  targetAngle = mpu6050.getAngleZ() - 90.0 ;
+  while (targetAngle < mpu6050.getAngleZ())
   {
-    analogWrite(Rmotor_vel, 110);
-    analogWrite(Lmotor_vel, 110);
-    digitalWrite(motor_R1, HIGH);
-    digitalWrite(motor_R2, LOW);
-    digitalWrite(motor_L1, LOW);
-    digitalWrite(motor_L2, HIGH);
+    analogWrite(Rmotor_vel, TURN_SPEED);
+    analogWrite(Lmotor_vel, TURN_SPEED);
+    digitalWrite(motor_R1, LOW);
+    digitalWrite(motor_R2, HIGH);
+    digitalWrite(motor_L1, HIGH);
+    digitalWrite(motor_L2, LOW);
     getvalues();
-    Serial.println(angleZ);
   }
-
-  // delay(TURN_90_DELAY);
 }
 
 void Tright180()
@@ -309,20 +230,19 @@ void Tright180()
   forward();
   delay(TURN_FROWARD_DELAY);
   off();
-  targetAngle = fmod(angleZ + 180.0, 360.0);
-  while (angleZ < targetAngle)
+  delay(200);
+  //targetAngle = fmod(mpu6050.getAngleZ() - 180.0, 360.0);
+  targetAngle = mpu6050.getAngleZ() - 180.0;
+  while (targetAngle < mpu6050.getAngleZ())
   {
-    analogWrite(Rmotor_vel, 120);
-    analogWrite(Lmotor_vel, 120);
-    digitalWrite(motor_R1, HIGH);
-    digitalWrite(motor_R2, LOW);
-    digitalWrite(motor_L1, LOW);
-    digitalWrite(motor_L2, HIGH);
+    analogWrite(Rmotor_vel, TURN_SPEED);
+    analogWrite(Lmotor_vel, TURN_SPEED);
+    digitalWrite(motor_R1, LOW);
+    digitalWrite(motor_R2, HIGH);
+    digitalWrite(motor_L1, HIGH);
+    digitalWrite(motor_L2, LOW);
     getvalues();
-    Serial.println(angleZ);
   }
-
-  // delay(TURN_180_DELAY);
 }
 
 void getvalues()
@@ -334,10 +254,9 @@ void getvalues()
   right_ir = digitalRead(RIGHT_IR);
   extright_ir = digitalRead(extRIGHT_IR);
 
-  mpu.getMotion6(&ax, &ay, &az, NULL, NULL, NULL);
-
-  angleZ = atan2(-ax, -az) - angleOffset;
-  angleZ = angleZ * 180 / M_PI;
+  mpu6050.update();
+  Serial.print("angleZ : ");
+  Serial.println(mpu6050.getAngleZ());
 }
 
 void compare()
@@ -366,11 +285,11 @@ void compare()
     off();
     delay(100);
     Intersection_mask = 1;
-    if ((y > 0 && x < 0 && mark1 == 1) || (y < 0 && x > 0 && mark1 == 1))
+    if ((y > 0 && x < 0 /*&& mark1 == 1*/) || (y < 0 && x > 0 /*&& mark1 == 1*/))
     {
       pos--;
     }
-    else if ((x < 0 && y < 0 && mark2 == 1) || (y < 0 && x == 0) || (x < 0 && y == 0))
+    else if ((x < 0 && y < 0 /*&& mark2 == 1*/) || (y < 0 && x == 0) || (x < 0 && y == 0))
     {
       pos--;
     }
@@ -526,6 +445,7 @@ void calc()
 
 void orientation()
 {
+  mpu6050.update();
   if (state == 2)
   { // reverse Orientation
     Tright180();
