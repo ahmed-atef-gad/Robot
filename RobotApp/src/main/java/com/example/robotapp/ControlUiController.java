@@ -2,7 +2,7 @@ package com.example.robotapp;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.effect.Bloom;
 import javafx.scene.shape.Circle;
 
@@ -36,7 +36,7 @@ public class ControlUiController implements ControlledScreen {
     ChoiceBox<String> choiceMenu;
 
     @FXML
-    Label message;
+    TextArea messageArea;
 
     @Override
     public void setParents(ScreensController screenPage, Main logical) {
@@ -99,6 +99,7 @@ public class ControlUiController implements ControlledScreen {
     @FXML
     protected void reconnectDevice() {
         myLogicalParent.reconnectDevice();
+        messageArea.clear();
     }
 
     public void receivedMassage(String msg) {
@@ -112,24 +113,11 @@ public class ControlUiController implements ControlledScreen {
                 }
             }
             //set active node color #3dea4b
-            circles[x][y].setFill(javafx.scene.paint.Color.web("#3dea4b"));
-            circles[x][y].setEffect(new Bloom(.3));
+            circles[y][x].setFill(javafx.scene.paint.Color.web("#3dea4b"));
+            circles[y][x].setEffect(new Bloom(.3));
         } else {
-            message.setText(msg);
-            setTimeOut();
+            messageArea.appendText(msg + "\n");
         }
     }
-
-    private void setTimeOut() {
-        new Thread(() -> {
-            try {
-                Thread.sleep(5000);
-                message.setText("");
-            } catch (InterruptedException e) {
-                e.fillInStackTrace();
-            }
-        }).start();
-    }
-
 
 }
