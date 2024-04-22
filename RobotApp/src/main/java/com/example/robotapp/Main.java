@@ -123,7 +123,7 @@ public class Main extends Application {
         AnchorPane.setLeftAnchor(mainContainer, 0.0);
         AnchorPane.setRightAnchor(mainContainer, 0.0);
 
-        Scene scene = new Scene(root, 800, 600);
+        Scene scene = new Scene(root, 800, 700);
         primaryStage.setTitle("Bluetooth Chat v1.0");
         primaryStage.setScene(scene);
         primaryStage.show();

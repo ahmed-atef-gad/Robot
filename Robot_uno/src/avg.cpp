@@ -6,7 +6,7 @@ int x = 0, y = 0, ox = 0, oy = 0, nx = 0, ny = 0, pos = 0;
 int pxy[2], prev[2];
 int income[2];
 int state = 0; // orientation state (1=Forward, 2=Reverse, 3=Right, 4=Left)Zero is initial state
-int cordinates = 0;
+int command = 0;
 float targetAngle = 0;
 int TURN_FROWARD_DELAY = 300;
 
@@ -24,19 +24,19 @@ void avg()
                 ;
             if (Serial.available())
             {
-                cordinates = Serial.parseInt();
-                income[0] = cordinates / 10;
-                income[1] = cordinates % 10;
+                command = Serial.parseInt();
+                income[0] = command / 10;
+                income[1] = command % 10;
             }
             serial_mask = 1;
         }
         Serial.print("Cordinates: ");
-        Serial.println(cordinates);
-        if (cordinates == -1)
+        Serial.println(command);
+        if (command == -1)
         {
             reset();
         }
-        else if (cordinates == -2)
+        else if (command == -2)
         {
             Serial.print("(");
             Serial.print(ox);
@@ -44,19 +44,22 @@ void avg()
             Serial.print(oy);
             Serial.println(")");
         }
-        else if (cordinates == -3)
+        else if (command == -3)
         {
             Serial.print("set turn delay: ");
+            delay(200);
             while (!Serial.available())
                 ;
             if (Serial.available())
             {
                 TURN_FROWARD_DELAY = Serial.parseInt();
             }
+            Serial.println(TURN_FROWARD_DELAY);
         }
-        else if (cordinates == -100)
+        else if (command == -100)
         {
             toggle_mode();
+            command = -1;
             break;
         }
         else
@@ -70,6 +73,7 @@ void initMpu()
 {
     mpu6050.begin();
     mpu6050.calcGyroOffsets(true);
+    Serial.println("Robot is ready to go  (●'◡'●)");
 }
 
 void reset()
@@ -87,7 +91,7 @@ void reset()
     pxy[1] = 0;
     prev[0] = 0;
     prev[1] = 0;
-    cordinates = 0;
+    command = 0;
     serial_mask = 0;
     Serial.println("Reset Done>>>>");
     delay(200);
@@ -446,10 +450,6 @@ void Tleft90()
     {
         Tleft();
         getvalues();
-        Serial.print("targetAngle: ");
-        Serial.print(targetAngle);
-        Serial.print("       currentAngle: ");
-        Serial.println(mpu6050.getAngleZ());
     }
 }
 

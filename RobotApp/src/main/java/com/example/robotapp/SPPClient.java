@@ -119,6 +119,21 @@ public class SPPClient implements DiscoveryListener {
         }
     }
 
+//    public void connectToDefualtDevice() {
+//        // address 201506105306
+//        try {
+//            RemoteDevice remoteDevice = RemoteDevice.getRemoteDevice("0019B9E0B5A8");
+//            partnerName = remoteDevice.getFriendlyName(true);
+//            UUID[] uuidSet = new UUID[1];
+//            uuidSet[0] = new UUID("1101", true);
+//            System.out.println("\nSearching for service...");
+//            agent.searchServices(null, uuidSet, remoteDevice, this);
+//            System.out.println("Connecting to " + remoteDevice.getFriendlyName(true) + " " + remoteDevice.getBluetoothAddress());
+//        } catch (IOException e) {
+//            e.fillInStackTrace();
+//        }
+//    }
+
 
     // methods of DiscoveryListener
     public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
