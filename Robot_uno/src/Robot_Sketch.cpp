@@ -2,7 +2,7 @@
 #include "Robot_config.h"
 #include "manual.h"
 #include "l298_driver.h"
-#include <avg.h>
+#include <agv.h>
 #include <Wire.h>
 
 bool mode = true; // true for autonomous mode and false for manual mode
@@ -34,7 +34,7 @@ void loop()
 {
   if (mode)
   {
-    avg();
+    agv();
   }
   else
   {

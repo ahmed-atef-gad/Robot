@@ -59,7 +59,7 @@
                         <Insets top="20.0" />
                     </VBox.margin>
                 </TextArea>
-                <Button mnemonicParsing="false" onAction="#reset" prefHeight="26.0" prefWidth="150.0" style="-fx-border-radius: 20px; -fx-background-color: #235fff;" text="Reset">
+                <Button mnemonicParsing="false" onAction="#reset" prefHeight="26.0" prefWidth="150.0" style="-fx-border-radius: 20px; -fx-background-color: #ff3311;" text="Reset">
                     <font>
                         <Font name="System Bold" size="14.0" />
                     </font>
@@ -75,6 +75,14 @@
                         <Insets left="50.0" right="50.0" top="30.0" />
                     </VBox.margin>
                 </Button>
+            <Button mnemonicParsing="false" onAction="#toggleMode" prefHeight="26.0" prefWidth="150.0" style="-fx-border-radius: 20px; -fx-background-color: #235fff;" text="Toggle Mode">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+               <VBox.margin>
+                  <Insets left="50.0" right="50.0" top="30.0" />
+               </VBox.margin>
+            </Button>
             </children>
         </VBox>
         <Pane prefHeight="600.0" prefWidth="550.0">

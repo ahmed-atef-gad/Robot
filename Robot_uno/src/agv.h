@@ -14,7 +14,7 @@ void moveX();
 void moveY_neg();
 void moveX_neg();
 void reset();
-void avg();
+void agv();
 void Tleft90();
 void Tright90();
 void Tright180();

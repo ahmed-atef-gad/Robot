@@ -1,4 +1,4 @@
-#include "avg.h"
+#include "agv.h"
 
 int left_ir, right_ir, extleft_ir, extright_ir; // Define variables which used to store digital inputs values
 int Intersection_mask = 0, start_mask = 0, mark1 = 0, mark2 = 0, serial_mask = 0;
@@ -12,7 +12,7 @@ int TURN_FROWARD_DELAY = 300;
 
 MPU6050 mpu6050(Wire);
 
-void avg()
+void agv()
 {
     while (true)
     {
@@ -30,7 +30,7 @@ void avg()
             }
             serial_mask = 1;
         }
-        Serial.print("Cordinates: ");
+        Serial.print("Command: ");
         Serial.println(command);
         if (command == -1)
         {
@@ -55,6 +55,7 @@ void avg()
                 TURN_FROWARD_DELAY = Serial.parseInt();
             }
             Serial.println(TURN_FROWARD_DELAY);
+            command = -1;
         }
         else if (command == -100)
         {
@@ -73,7 +74,7 @@ void initMpu()
 {
     mpu6050.begin();
     mpu6050.calcGyroOffsets(true);
-    Serial.println("Robot is ready to go  (●'◡'●)");
+    Serial.println("\nRobot is ready to go  (●'◡'●)");
 }
 
 void reset()
@@ -161,6 +162,12 @@ void calc()
     if (x == 0 && y == 0)
     {
         Serial.println("Already at the destination");
+        Serial.print("(");
+        Serial.print(ox);
+        Serial.print(",");
+        Serial.print(oy);
+        Serial.println(")");
+
         delay(200);
         serial_mask = 0;
         return;
