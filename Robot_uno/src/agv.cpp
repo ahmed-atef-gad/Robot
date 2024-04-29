@@ -8,7 +8,9 @@ int income[2];
 int state = 0; // orientation state (1=Forward, 2=Reverse, 3=Right, 4=Left)Zero is initial state
 int command = 0;
 float targetAngle = 0;
-int TURN_FROWARD_DELAY = 300;
+int TURN_FROWARD_DELAY = 320;
+int TURN_SPEED = 150;
+int offset = 10;
 
 MPU6050 mpu6050(Wire);
 
@@ -452,10 +454,15 @@ void Tleft90()
     off();
     delay(200);
     // targetAngle = fmod(mpu6050.getAngleZ() + 90.0, 360.0);
-    targetAngle = mpu6050.getAngleZ() + 90.0;
+    targetAngle = mpu6050.getAngleZ() + (90.0 - offset);
     while (targetAngle > mpu6050.getAngleZ())
     {
-        Tleft();
+        analogWrite(RMOTOR_vel, TURN_SPEED);
+        analogWrite(LMOTOR_vel, TURN_SPEED);
+        digitalWrite(MOTOR_R1, HIGH);
+        digitalWrite(MOTOR_R2, LOW);
+        digitalWrite(MOTOR_L1, LOW);
+        digitalWrite(MOTOR_L2, HIGH);
         getvalues();
     }
 }
@@ -466,10 +473,15 @@ void Tright90()
     delay(TURN_FROWARD_DELAY);
     off();
     delay(200);
-    targetAngle = mpu6050.getAngleZ() - 90.0;
+    targetAngle = mpu6050.getAngleZ() - (90.0 - offset);
     while (targetAngle < mpu6050.getAngleZ())
     {
-        Tright();
+        analogWrite(RMOTOR_vel, TURN_SPEED);
+        analogWrite(LMOTOR_vel, TURN_SPEED);
+        digitalWrite(MOTOR_R1, LOW);
+        digitalWrite(MOTOR_R2, HIGH);
+        digitalWrite(MOTOR_L1, HIGH);
+        digitalWrite(MOTOR_L2, LOW);
         getvalues();
     }
 }
@@ -480,10 +492,15 @@ void Tright180()
     delay(TURN_FROWARD_DELAY);
     off();
     delay(200);
-    targetAngle = mpu6050.getAngleZ() - 180.0;
+    targetAngle = mpu6050.getAngleZ() - (180.0 - 2*offset);
     while (targetAngle < mpu6050.getAngleZ())
     {
-        Tright();
+        analogWrite(RMOTOR_vel, TURN_SPEED);
+        analogWrite(LMOTOR_vel, TURN_SPEED);
+        digitalWrite(MOTOR_R1, LOW);
+        digitalWrite(MOTOR_R2, HIGH);
+        digitalWrite(MOTOR_L1, HIGH);
+        digitalWrite(MOTOR_L2, LOW);
         getvalues();
     }
 }
