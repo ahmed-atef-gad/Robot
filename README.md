@@ -55,4 +55,9 @@ To get started with the project, follow these steps:
 
 5. **Control and Testing**: Use the JavaFX interface to send control commands to the AGV, testing both manual and autonomous operation modes.
 
+## Circuit Diagram
+
+ ![Sizzling Krunk-Trug](https://github.com/ahmed-atef-gad/Robot/assets/89663624/d9aa9871-af7a-48b0-bf35-0a65706cf42c)
+
+
 ### This project was developed as part of Control Course.
