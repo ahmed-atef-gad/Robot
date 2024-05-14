@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -88,7 +89,7 @@ public class Main extends Application {
         out.flush();
     }
 
-    public void recieveMsg(String s) {
+    public void receiveMsg(String s) {
         ChatScreenController ch = ((ChatScreenController) mainContainer.getScreenController("ChatScreen"));
         ch.receivedMassage(s);
         ControlUiController cu = ((ControlUiController) mainContainer.getScreenController("ControlUi"));
@@ -104,7 +105,7 @@ public class Main extends Application {
                     if (in != null) {
                         System.out.println("in not null");
                         String s = in.readLine();
-                        if (s != null) Platform.runLater(() -> recieveMsg(s));
+                        if (s != null) Platform.runLater(() -> receiveMsg(s));
                         else isRun = false;
                     }
                 } catch (IOException e) {
@@ -124,7 +125,8 @@ public class Main extends Application {
         AnchorPane.setRightAnchor(mainContainer, 0.0);
 
         Scene scene = new Scene(root, 800, 700);
-        primaryStage.setTitle("Bluetooth Chat v1.0");
+        primaryStage.setTitle("AVG");
+        primaryStage.getIcons().add(new Image(String.valueOf(getClass().getResource("icon.jpeg"))));
         primaryStage.setScene(scene);
         primaryStage.show();
     }
